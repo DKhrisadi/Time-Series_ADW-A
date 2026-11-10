@@ -1,8 +1,8 @@
 # Analisis dan Peramalan Deret Waktu PDB Industri Makanan dan Minuman Indonesia (2010 Q1 – 2026 Q3)
 
-**Penulis:** Daffa Muhammad Khrisadi (`24083010062`) — Analisis Deret Waktu A
+Daffa Muhammad Khrisadi (`24083010062`) — Analisis Deret Waktu A
 
-Repositori ini mendokumentasikan penelitian analisis dan peramalan deret waktu (_time series forecasting_) pada **Produk Domestik Bruto (PDB) Seri 2010 Atas Dasar Harga Konstan (ADHK 2010) Subsektor Industri Makanan dan Minuman** di Indonesia. Dokumen ini menguraikan latar belakang permasalahan, spesifikasi dataset, kerangka metodologi secara menyeluruh (mulai dari eksplorasi data, uji ketidakstasioneran, pemodelan _baseline_, hingga spesifikasi model utama **RegARIMA/SARIMA** dan metode pembanding **SVR-RBF**), serta hasil evaluasi kuantitatif yang selaras dengan tahapan pada _notebook_.
+Repositori ini mendokumentasikan penelitian analisis dan peramalan deret waktu (_time series forecasting_) pada **Produk Domestik Bruto (PDB) Seri 2010 Atas Dasar Harga Konstan (ADHK 2010) Subsektor Industri Makanan dan Minuman** di Indonesia. Dokumen ini menguraikan latar belakang permasalahan, spesifikasi dataset, kerangka metodologi secara menyeluruh (mulai dari eksplorasi data, uji ketidakstasioneran, pemodelan _baseline_, serta hasil evaluasi kuantitatif yang selaras dengan tahapan pada _notebook_.
 
 ---
 
@@ -16,7 +16,7 @@ Secara statistik dan ekonometrika, peramalan output riil Industri Makanan dan Mi
 2. **Perubahan Kemiringan Tren Pasca-Pandemi (_Structural Regime Shift_):** Setelah tumbuh dengan laju eksponensial yang relatif stabil pada dekade `2010–2019`, guncangan pandemi COVID-19 pada `2020–2021` menggeser level dan kemiringan lintasan pertumbuhan jangka menengah, sehingga model tren deterministik tunggal mengalami bias proyeksi yang besar.
 3. **Siklus Musiman Kuartalan ($s = 4$) dan Pergeseran Kalender Hari Raya (_Moving Holiday_):** Permintaan dan produksi makanan-minuman berfluktuasi secara musiman setiap empat triwulan (menguat pada pertengahan tahun dan melandai di akhir/awal tahun). Di samping siklus kalender Masehi, lonjakan konsumsi bulan **Ramadan dan Hari Raya Idul Fitri** bergeser maju sekitar 11 hari setiap tahun — jatuh penuh di **Q3** pada `2010–2013`, berpindah ke **Q2** pada `2017–2022`, terbagi di perbatasan `Q1–Q2` pada `2023–2024`, dan masuk penuh ke **Q1** pada `2025–2026`.
 
-Karakteristik tersebut menuntut kerangka pemodelan deret waktu yang mampu menangani akar unit (_unit root_), ketergantungan autokorelasi musiman, serta efek variasi kalender secara simultan.
+Karakteristik ini menuntut kerangka pemodelan deret waktu yang mampu menangani akar unit (_unit root_), ketergantungan autokorelasi musiman, serta efek variasi kalender secara simultan.
 
 ---
 

@@ -1,4 +1,4 @@
-# Analisis dan Peramalan PDB Industri Makanan dan Minuman Indonesia (2010 Q1 – 2026 Q3)
+# Peramalan PDB Triwulanan Industri Makanan dan Minuman Indonesia Menggunakan Metode SARIMA dan Support Vector Regression (SVR)
 
 Daffa Muhammad Khrisadi (`24083010062`) — Analisis Deret Waktu A
 

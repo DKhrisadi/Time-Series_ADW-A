@@ -39,7 +39,7 @@ Alur analisis disusun secara bertahap tanpa kebocoran data masa depan (*no data 
 2. **Eksplorasi Data (EDA):** Meliputi pemeriksaan kualitas data, pemisahan komponen tren dan musiman dengan dekomposisi **STL**, analisis pertumbuhan antar-triwulan (*q-to-q*), pemetaan pergeseran hari raya, serta deteksi *outlier* menggunakan *Robust Z-Score*.
 3. **Uji Stasioneritas:** Dilakukan pada *Training Set* melalui visualisasi *Rolling Mean* dan *Rolling Standard Deviation*, evaluasi stabilitas varians dengan **Box-Cox**, plot **ACF & PACF**, serta uji statistik **ADF** dan **KPSS**.
 4. **Model Baseline Awal:** Membangun tiga model acuan sederhana pada *Training Set* untuk dievaluasi di *Validation Set*, yaitu **Naive (Last Value)**, **Seasonal Naive**, dan **Regresi Log-Linear Trend + Seasonal Dummy (OLS)**.
-5. **Model Statistik Utama — SARIMA & RegARIMA (Progress 3):** Melakukan transformasi logaritma dan uji diferensiasi ($d, D, s=4$) pada *Training Set*, identifikasi kandidat orde via ACF/PACF, estimasi serta seleksi model **SARIMA** dan **RegARIMA** (eksogen `hari_ramadan_idul_fitri`) berdasarkan AIC/AICc/BIC per rezim, validasi diagnostik residual (*Ljung-Box*, *Shapiro-Wilk*, *Jarque-Bera*, dan *ARCH-LM*), serta evaluasi 8 langkah pada *Validation Set*.
+5. **Model Statistik Utama — SARIMA (Progress 3):** Melakukan transformasi logaritma dan uji diferensiasi ($d, D, s=4$) pada *Training Set*, identifikasi kandidat orde via ACF/PACF, estimasi serta seleksi kandidat model **SARIMA** berdasarkan AIC/AICc/BIC per rezim, validasi diagnostik residual (*Ljung-Box*, *Shapiro-Wilk*, *Jarque-Bera*, dan *ARCH-LM*), serta evaluasi 8 langkah pada *Validation Set*.
 6. **Model Pembanding & Evaluasi Akhir (Tahap Lanjutan):** Membangun **Support Vector Regression (`SVR-RBF`)** berbasis fitur *lag* musiman dan kalender pada *Validation Set* (Progress 4), lalu melatih ulang kedua model final pada gabungan `Train + Validation` untuk perbandingan akhir pada *Test Set* (`2024-Q4`–`2026-Q3`) yang hingga saat ini tetap dikunci (*no data leakage*).
 
 ---
@@ -59,13 +59,14 @@ Estimasi Box-Cox menghasilkan nilai optimal `lambda = 0,6817`. Data level asli m
 | **Diferensiasi Musiman $\Delta_4\ln(Y_t)$** | -1,1546 | 0,6928 | 0,0231 | Tidak Stasioner |
 | **Diferensiasi Ganda $\Delta\Delta_4\ln(Y_t)$** | **-6,3315** | **0,0000** | **0,1000** | **Stasioner** |
 
-### Hasil Evaluasi Baseline & SARIMA/RegARIMA (*Validation Set*: `2022-Q4` – `2024-Q3`)
+### Hasil Evaluasi Baseline & SARIMA (*Validation Set*: `2022-Q4` – `2024-Q3`)
 
 | Model | Diagnostik | RMSE (Miliar Rp) | MAE (Miliar Rp) | MAPE (%) | sMAPE (%) | MASE |
 | :--- | :---: | ---: | ---: | ---: | ---: | ---: |
 | **`SARIMA(0,1,0)(1,0,0)_4 + drift` (Log) — Terpilih** | **Lolos** | **3.189,90** | **2.177,65** | **1,023%** | **1,033%** | **0,235** |
 | `SARIMA(0,1,0)(2,0,0)_4 + drift` (Log) | Lolos | 4.004,44 | 3.251,33 | 1,511% | 1,528% | 0,350 |
-| `RegARIMA(0,1,0)(1,0,0)_4 + drift + Ramadan` (Log) | Lolos | 4.044,19 | 3.030,57 | 1,416% | 1,433% | 0,327 |
+| `SARIMA(1,1,0)(1,0,1)_4 + drift` (Log) | Lolos | 4.183,43 | 3.454,39 | 1,605% | 1,623% | 0,372 |
+| `SARIMA(0,1,0)(1,0,1)_4 + drift` (Log) | Lolos | 4.261,87 | 3.521,89 | 1,636% | 1,656% | 0,380 |
 | `SARIMA(1,0,0)(1,1,0)_4 + drift` (Log) | Lolos | 4.475,78 | 3.763,61 | 1,735% | 1,735% | 0,406 |
 | `SARIMA(0,1,0)(0,1,1)_4` (Log) | Tidak Lolos | 6.448,36 | 5.542,14 | 2,568% | 2,613% | 0,597 |
 | Baseline 1 — Naive (Last Value) | Baseline | 9.407,24 | 7.475,00 | 3,387% | 3,474% | 0,806 |
@@ -73,7 +74,6 @@ Estimasi Box-Cox menghasilkan nilai optimal `lambda = 0,6817`. Data level asli m
 | Baseline 3 — Log-Linear + Seasonal OLS | Baseline | 23.407,15 | 22.724,00 | 10,481% | 9,935% | 2,449 |
 
 - **`SARIMA(0,1,0)(1,0,0)_4 + drift` pada skala logaritma** menjadi model statistik terbaik pada tahap validasi: memangkas RMSE sebesar **66,1%** dibanding *baseline* Naive (`9.407,24`) dan **82,1%** dibanding Seasonal Naive (`17.789,37`), dengan `MASE = 0,235`, cakupan interval prediksi 95% sempurna (**8/8**), serta lolos penuh uji diagnostik residual (*Ljung-Box* lag 4/8/12 $p \ge 0,1037$; *Shapiro-Wilk* $p = 0,2128$; *Jarque-Bera* $p = 0,2185$; *ARCH-LM* $p = 0,6727$).
-- **Uji RegARIMA (`hari_ramadan_idul_fitri`):** Koefisien linier hari Ramadan tidak signifikan secara statistik pada *Training Set* ($p = 0,4858$–$0,9979$) dan tidak melampaui akurasi SARIMA murni pada validasi karena pergeseran Ramadan ke Q1 baru dimulai sejak `2023-Q1`.
 - **Tahap Berikutnya:** Membangun model pembanding **SVR-RBF** pada *Validation Set* yang sama (Progress 4) sebelum membuka *Test Set* (`2024-Q4`–`2026-Q3`) untuk perbandingan final.
 
 ---
@@ -88,7 +88,7 @@ Time-Series_ADW-A/
 │   └── pdb_industri_makanan_minuman_bps.csv
 ├── notebook/
 │   ├── Analisis_Deret_Waktu_PDB_Mamin.ipynb          # Progress 1: EDA, Stasioneritas Awal, & Baseline
-│   └── Progress3_Pemodelan_SARIMA_RegARIMA.ipynb     # Progress 3: Diferensiasi, SARIMA/RegARIMA, Diagnostik, & Validasi
+│   └── Progress3_Pemodelan_SARIMA.ipynb              # Progress 3: Diferensiasi, Pemodelan SARIMA, Diagnostik, & Validasi
 ├── requirements.txt
 └── README.md
 ```
@@ -97,5 +97,5 @@ Time-Series_ADW-A/
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-jupyter lab notebook/Progress3_Pemodelan_SARIMA_RegARIMA.ipynb
+jupyter lab notebook/Progress3_Pemodelan_SARIMA.ipynb
 ```
